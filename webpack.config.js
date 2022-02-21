@@ -3,14 +3,15 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
+const NodemonPlugin = require('nodemon-webpack-plugin');
 
 module.exports = {
   /**
    * Setting target as 'web' is important
    * Without this, webpack-dev-server does not work with .browserslistrc file
    */
-  target: 'web',
-  entry: './src/index.js',
+  target: 'node',
+  entry: './index.ts',
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: '[name].bundle.js',
@@ -21,10 +22,15 @@ module.exports = {
   },
   devtool: 'eval',
   resolve: {
-    extensions: ['.js', '.json', '.scss', '.css'],
+    extensions: ['.js', '.ts', '.json'],
     alias: {
       assets: path.join(__dirname, 'src/assets'),
     },
+  },
+  node: {
+    global: false,
+    __filename: true,
+    __dirname: true,
   },
   module: {
     rules: [
@@ -41,15 +47,12 @@ module.exports = {
         exclude: /node_modules/,
         use: ['babel-loader'],
       },
+      { test: /\.tsx?$/, loader: 'ts-loader' },
     ],
   },
   plugins: [
     new CleanWebpackPlugin(),
-    new HtmlWebpackPlugin({
-      template: 'index.html',
-      inject: 'body',
-    }),
-    new MiniCssExtractPlugin(),
+    new NodemonPlugin(),
     new ESLintPlugin({
       exclude: 'node_modules',
       failOnWarning: true,
